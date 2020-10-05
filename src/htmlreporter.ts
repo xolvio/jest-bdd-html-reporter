@@ -14,6 +14,7 @@ import stripAnsi from "strip-ansi";
 import xmlbuilder, { XMLElement } from "xmlbuilder";
 
 import sorting from "./sorting";
+import { parseRawCode } from "./parseRawCode";
 
 class HTMLReporter {
   public testData: AggregatedResult;
@@ -81,6 +82,11 @@ class HTMLReporter {
     headTag.ele("meta", { charset: "utf-8" });
     headTag.ele("title", {}, this.getConfigValue("pageTitle"));
 
+    // <body>
+    // 	...
+
+    // </body>
+
     // Default to the currently set theme
     let stylesheetFilePath: string = path.join(
       __dirname,
@@ -100,7 +106,28 @@ class HTMLReporter {
         stylesheetFilePath,
         "utf8"
       );
-      headTag.raw(`<style type="text/css">${stylesheetContent}</style>`);
+      headTag.raw(`<style type="text/css">${stylesheetContent}
+    .punctuation, .operator {
+      color: rgba(0,0,0,0) !important;
+      background: none !important;
+    }
+    
+    .function + .punctuation + .function::after {
+      content: " with";
+      color: #666;
+    }
+    
+    .operator::after {
+        content: "is a";
+        color: #666;
+        position: relative;
+        left: -5px;
+    }
+    
+    .codeWrapper {
+        margin: 10px; 
+    }
+</style>`);
     } else {
       headTag.ele("link", {
         rel: "stylesheet",
@@ -108,6 +135,13 @@ class HTMLReporter {
         href: stylesheetFilePath,
       });
     }
+
+    headTag.ele("link", {
+      rel: "stylesheet",
+      type: "text/css",
+      href:
+        "https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/themes/prism.min.css",
+    });
 
     const reportBody = report.ele("body");
     // Add the test report to the body
@@ -120,6 +154,11 @@ class HTMLReporter {
         `<script src="${this.getConfigValue("customScriptPath")}"></script>`
       );
     }
+
+    reportBody.raw(`
+       	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/prism-core.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/plugins/autoloader/prism-autoloader.min.js"></script>`);
+
     return report;
   }
 
@@ -364,7 +403,16 @@ class HTMLReporter {
                   : " "
               );
               // Test Title
-              testInfo.ele("div", { class: "test-title" }, test.title);
+              const testsplit = test.title.split("@@");
+              if (testsplit && testsplit.length === 2) {
+                testInfo.ele(
+                  "div",
+                  { class: "test-title" },
+                  test.title.split("@@")[0]
+                );
+              } else {
+                testInfo.ele("div", { class: "test-title" }, test.title);
+              }
               // Test Status
               testInfo.ele("div", { class: "test-status" }, test.status);
               // Test Duration
@@ -395,6 +443,12 @@ class HTMLReporter {
                   );
                 });
               }
+
+              const html = parseRawCode(test.title.split("@@")[1]);
+
+              testResult.raw(
+                `<div class="codeWrapper"><code style="white-space: pre-wrap">${html}</code></div>`
+              );
             });
 
           // All console.logs caught during the test run

@@ -1,7 +1,7 @@
 {
-  "name": "jest-html-reporter",
+  "name": "jest-bdd-html-reporter",
   "version": "3.2.0",
-  "description": "Jest test results processor for generating a summary in HTML",
+  "description": "Jest test results processor for generating a BDD summary in HTML",
   "main": "dist/index.js",
   "unpkg": "dist/index.js",
   "files": [
@@ -14,11 +14,11 @@
     "jest": "jest --no-cache --config=jest.config.json",
     "test": "npm run lint && npm run bundle && npm run jest",
     "bundle": "rollup -c",
-    "build": "npm run test && npm run bundle"
+    "build": "npm run bundle"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Hargne/jest-html-reporter.git"
+    "url": "git+https://github.com/xolvio/jest-bdd-html-reporter.git"
   },
   "keywords": [
     "jest",
@@ -30,9 +30,9 @@
   "author": "Johan Hargne",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Hargne/jest-html-reporter/issues"
+    "url": "https://github.com/xolvio/jest-bdd-html-reporter/issues"
   },
-  "homepage": "https://github.com/Hargne/jest-html-reporter#readme",
+  "homepage": "https://github.com/xolvio/jest-bdd-html-reporter#readme",
   "engines": {
     "node": ">=4.8.3"
   },
@@ -50,6 +50,8 @@
     "@types/sinon": "^7.5.2",
     "dateformat": "3.0.2",
     "mkdirp": "^1.0.3",
+    "prettier": "^2.1.2",
+    "prismjs": "^1.21.0",
     "sinon": "^9.0.1",
     "strip-ansi": "6.0.0",
     "xmlbuilder": "15.0.0"
